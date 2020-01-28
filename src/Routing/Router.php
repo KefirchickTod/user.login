@@ -7,21 +7,13 @@ use App\Interfaces\RouterIntefaces;
 class Router implements RouterIntefaces
 {
 
-    const VARIABLE_REGEX = <<<'REGEX'
-\{
-    \s* ([a-zA-Z][a-zA-Z0-9_]*) \s*
-    (?:
-        : \s* ([^{}]*(?:\{(?-1)\}[^{}]*)*)
-    )?
-\}
-REGEX;
-    const DEFAULT_DISPATCH_REGEX = '[^/]+';
     /**
      * @var string
      */
     protected $basePath;
 
     private $container = [];
+
     /**
      * @inheritDoc
      */
@@ -52,29 +44,10 @@ REGEX;
 
     /**
      * @param string $pattern
-     * @return mixed[][]
+     * @return string
      */
-    public function parse(string $pattern) {
-        $routeWithoutClosingOptionals = rtrim($pattern, ']');
-        $numOptionals = strlen($pattern) - strlen($routeWithoutClosingOptionals);
-
-        // Split on [ while skipping placeholders
-        $segments = preg_split('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \[~x', $routeWithoutClosingOptionals);
-        if ($numOptionals !== count($segments) - 1) {
-            throw new \Error("Number of opening '[' and closing ']' does not match");
-        }
-
-        $currentRoute = '';
-        $routeDatas = [];
-        foreach ($segments as $segment) {
-            if ($segment === '') {
-                throw new \Error("Empty optional part");
-            }
-
-            $currentRoute .= $segment;
-            $routeDatas[] = $this->parsePlaceholders($currentRoute);
-        }
-        return $routeDatas;
+    public function parse(string $pattern) :string {
+        return '';
     }
 
     /**
