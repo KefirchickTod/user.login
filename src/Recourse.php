@@ -46,7 +46,7 @@ class Recourse
             if (file_exists($value)) {
                 $this->template .= include_once($value);
             } else {
-                throw new \Error("!File_exits for file " . $value);
+                throw new \Error("Fount not found in path " . $value);
             }
         }
     }
