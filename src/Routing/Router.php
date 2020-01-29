@@ -2,11 +2,19 @@
 
 namespace App\Routing;
 
+use App\HTTP\Uri;
 use App\Interfaces\RouterIntefaces;
+use App\Models\Model;
+use App\Recourse;
+
 
 class Router implements RouterIntefaces
 {
-
+    private $route;
+    /**
+     * @var string[]
+     */
+    private $methods;
     /**
      * @var string
      */
@@ -14,13 +22,23 @@ class Router implements RouterIntefaces
 
     private $container = [];
 
+    public function __construct()
+    {
+    }
+
     /**
      * @inheritDoc
      */
-    public function map($methods, string $pattern, $callable)
+    public function map($methods, $group, $callable)
     {
         $methods = array_map('strtolower', $methods);
-        $route = new Route($methods);
+        $callable = !$callable ? $this : $callable;
+        $route = new Route($methods, $group, $callable);
+        $this->route[] = $route;
+    }
+
+    public function getMethod(){
+
     }
 
     /**
@@ -42,43 +60,50 @@ class Router implements RouterIntefaces
         $this->container[$name] = $this;
     }
 
-    /**
-     * @param string $pattern
-     * @return string
-     */
-    public function parse(string $pattern) :string {
-        return '';
+
+    public function parse(string $pattern, Uri $uri, $methods) {
+
+        $path = str_replace($pattern, '', $uri->getPath());
+
+        foreach ($methods as $method){
+            $method = in_array($method, ['','index','/']) ? '/' : $method;
+
+            if(preg_match("~$method~", $path)){
+
+                return $method == '/' ? 'index' : $method;
+            }
+        }
+        return 'index';
     }
 
     /**
      * Parses a route string that does not contain optional segments.
      */
-    private function parsePlaceholders($route) {
-        if (!preg_match_all(
-            '~' . self::VARIABLE_REGEX . '~x', $route, $matches,
-            PREG_OFFSET_CAPTURE | PREG_SET_ORDER
-        )) {
-            return [$route];
-        }
 
-        $offset = 0;
-        $routeData = [];
-        foreach ($matches as $set) {
-            if ($set[0][1] > $offset) {
-                $routeData[] = substr($route, $offset, $set[0][1] - $offset);
+
+
+    public function run(){
+        $uri = \App\Http\Uri::creat(new \App\Http\ServerData());
+        foreach ($this->route as $data){
+
+            /** @var $data Route */
+            /** @var $model Model */
+
+            $model = $data->getModel();
+            $methods = get_class_methods($model);
+
+            if($method = $this->parse($data->getPattern(), $uri, $methods)){
+
+                if(class_exists($model)){
+                    $model = new $model;
+
+                    if(method_exists($model, $method)){
+                        return $model->$method();
+                    }
+                }
             }
-            $routeData[] = [
-                $set[1][0],
-                isset($set[2]) ? trim($set[2][0]) : self::DEFAULT_DISPATCH_REGEX
-            ];
-            $offset = $set[0][1] + strlen($set[0][0]);
         }
-
-        if ($offset != strlen($route)) {
-            $routeData[] = substr($route, $offset);
-        }
-
-        return $routeData;
+        return '';
     }
 
 }

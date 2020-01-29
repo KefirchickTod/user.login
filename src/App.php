@@ -2,24 +2,25 @@
 
 namespace App;
 
+use App\Routing\Router;
+
 class App
 {
 
-    protected $router;
 
-    public function __construct()
+    /**
+     * @var Router
+     */
+    private static $router;
+
+    public static function map(array $methods, array $group, $callable = null)
     {
-        $this->router = new \App\Routing\Router();
+        self::$router = self::$router ?: new \App\Routing\Router();
+        self::$router->map($methods, $group, $callable);
+        return self::$router;
     }
 
-    public static function map(array $methods, array $group, $callable)
-    {
-        $router = new \App\Routing\Router();
-        $router->map($methods, $group['pattern'], $callable);
-        return $router;
-    }
-
-    public static function post($pattern, $model, $callable)
+    public static function post($pattern, $model, $callable = null)
     {
         return self::map(['POST'], [
             'pattern' => $pattern,
@@ -27,11 +28,15 @@ class App
         ], $callable);
     }
 
-    public static function get($pattern, $model, $callable)
+    public static function get($pattern, $model, $callable = null)
     {
         return self::map(['GET'], [
             'pattern' => $pattern,
             'model'   => $model,
         ], $callable);
+    }
+    public static function run(){
+        $viewd =  self::$router->run();
+        echo $viewd;
     }
 }

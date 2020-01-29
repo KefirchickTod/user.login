@@ -1,5 +1,8 @@
 <?php
 
+namespace App\HTTP;
+
+use Error;
 
 class Uri
 {
@@ -12,9 +15,11 @@ class Uri
     private $query;
     private $fragment;
 
+    private $method;
+
     public $basePath;
 
-    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '')
+    public function __construct($scheme, $host, $port = null, $path = '/', $query = '', $fragment = '', $method = 'get')
     {
         $this->scheme = $this->filterScheme($scheme);
         $this->host = $host;
@@ -22,6 +27,7 @@ class Uri
         $this->path = empty($path) ? '/' : $this->filterPath($path);
         $this->query = $this->filterQuery($query);
         $this->fragment = $this->filterQuery($fragment);
+        $this->method = $method;
 
 
     }
@@ -98,8 +104,8 @@ class Uri
         $queryString = $serverData->get('QUERY_STRING', '');
 
         $fragment = '';
-
-        $uri = new static($scheme, $host, $port, $virtualPath, $queryString, $fragment);
+        $method = $serverData->get('REQUEST_METHOD');
+        $uri = new static($scheme, $host, $port, $virtualPath, $queryString, $fragment, $method);
         if ($basePath) {
             $uri = $uri->withBasePath($basePath);
         }
@@ -135,6 +141,9 @@ class Uri
     }
     public function getFragment(){
         return $this->fragment;
+    }
+    public function getMethod(){
+        return $this->method;
     }
 
 }

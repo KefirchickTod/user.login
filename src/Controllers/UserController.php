@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
-class UserController
+class UserController extends Controller
 {
-
+    public function getTable(): string
+    {
+        return 'user';
+    }
 }

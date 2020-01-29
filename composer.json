@@ -9,7 +9,10 @@
         }
     ],
     "minimum-stability": "beta",
-    "require": {},
+    "require": {
+      "ext-mbstring": "*",
+      "ext-pdo": "*"
+    },
     "autoload": {
         "psr-4": {
             "App\\" : "src/"

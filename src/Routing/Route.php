@@ -4,39 +4,61 @@
 namespace App\Routing;
 
 
-use App\Interfaces\RouterIntefaces;
+use App\Models\Model;
 
-class Route implements \App\Interfaces\RouteInterface
+class Route
 {
 
-    protected $methods = [];
-    protected $pattern = [];
-    protected $callaable;
+    /**
+     * @var string[]
+     */
+    private $methods;
 
-    public function __construct($methods, $pattern, $callable)
-    {
+    /**
+     * @var array
+     */
+    private $group;
+    /**
+     * @var string
+     */
+    private $pattern;
+
+    /**
+     * @var string
+     */
+    private $model;
+
+    private $callable;
+
+    private $indefier;
+
+    public function __construct($methods, $group, $callable, $indefier = 0) {
+
         $this->methods = $methods;
-        $this->pattern = $pattern;
-        $this->callaable = $callable;
+        $this->group = $group;
+        $this->pattern = $group['pattern'] ?: '/';
+        $this->model = $group['model'] ?: Model::class;
+        $this->callable = $callable;
+        $this->indefier = "route.{$indefier}";
     }
 
-    public function getArgument($name, $default = null)
-    {
-        // TODO: Implement getArgument() method.
+    public function getMethods(){
+        return $this->methods;
+    }
+    public function getPattern(){
+        return $this->pattern;
     }
 
-    public function getArguments()
-    {
-        // TODO: Implement getArguments() method.
+    public function getCallable(){
+        return $this->callable;
     }
 
-    public function getPattern()
-    {
-        // TODO: Implement getPattern() method.
+    public function getModel(){
+        return $this->model;
     }
 
-    public function run()
+    public function __invoke(Model $model, $method)
     {
-        // TODO: Implement run() method.
+
     }
 }
