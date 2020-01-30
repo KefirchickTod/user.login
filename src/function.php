@@ -45,12 +45,61 @@ if (!function_exists('addCss')) {
 }
 
 if (!function_exists('resource')) {
-    function resource($name, $parram = [])
-    {
-        $resource = new \App\Recourse();
-        $resource->add(is_array($name) ? $name : [$name]);
-        $resource->addParram($parram);
-        return $resource;
 
+    function resource($names, $param = [])
+    {
+        static $resource;
+        if (!$resource) {
+            $resource = new \App\Recourse();
+        }
+        $resource->set(!is_array($names) ? [$names] : $names, $param);
+        return $resource;
+    }
+}
+
+if (!function_exists('redirect_post')) {
+
+    /**
+     * @param $url
+     * @param array $data
+     * @param array|null $headers
+     * @throws Exception
+     */
+    function redirect_post($url, array $data, array $headers = null)
+    {
+        $params = [
+            'http' => [
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+            ],
+        ];
+        if (!is_null($headers)) {
+            $params['http']['header'] = '';
+            foreach ($headers as $k => $v) {
+                $params['http']['header'] .= "$k: $v\n";
+            }
+        }
+        $ctx = stream_context_create($params);
+        $fp = @fopen($url, 'rb', false, $ctx);
+        if ($fp) {
+            echo @stream_get_contents($fp);
+            die();
+        } else {
+            // Error
+            throw new Exception("Error loading '$url', $php_errormsg");
+        }
+    }
+}
+
+if(!function_exists('isLogin')){
+    function isLogin(){
+        return (bool)$_SESSION['log'];
+    }
+}
+
+if(!function_exists('redirect')){
+    function redirect($path){
+        header("Location : $path");
+        exit;
     }
 }

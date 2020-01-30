@@ -1,3 +1,4 @@
+
 <div id="back">
     <div class="backRight"></div>
     <div class="backLeft"></div>
@@ -5,30 +6,36 @@
 
 <div id="slideBox">
     <div class="topLayer">
-        <div class="left">
+        <div class="left" >
             <div class="content">
                 <h2>Sign Up</h2>
-                <form method="post" onsubmit="return false;">
+                <form method="post" action="/login/creat" >
                     <div class="form-group">
-                        <input type="text" placeholder="username" />
+                        <input type="text" name="username" required placeholder="Username*" />
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" required placeholder="Email*">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" name="password" required placeholder="Password*">
                     </div>
                     <div class="form-group"></div>
-                    <div class="form-group"></div>
-                    <div class="form-group"></div>
+                    <button id="goLeft" class="off">Login</button>
+                    <button type="submit" >Sign up</button>
                 </form>
-                <button id="goLeft" class="off">Login</button>
-                <button>Sign up</button>
             </div>
         </div>
         <div class="right">
             <div class="content">
                 <h2>Login</h2>
-                <form method="post" onsubmit="return false;">
+                <form method="post" action="/login">
                     <div class="form-group">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" />
+                        <input type="text" required placeholder="Username" />
                     </div>
-                    <button id="goRight" class="off">Sign Up</button>
+                    <div class="form-group">
+                        <input type="text" required placeholder="Password" />
+                    </div>
+                    <button onclick="return false;" id="goRight" class="off">Sign Up</button>
                     <button id="login" type="submit">Login</button>
                 </form>
             </div>

@@ -2,6 +2,8 @@
 
 namespace App\Routing;
 
+
+use App\Controllers\Controller;
 use App\HTTP\Uri;
 use App\Interfaces\RouterIntefaces;
 use App\Models\Model;
@@ -63,17 +65,19 @@ class Router implements RouterIntefaces
 
     public function parse(string $pattern, Uri $uri, $methods) {
 
-        $path = str_replace($pattern, '', $uri->getPath());
+        $path = trim(str_replace($pattern, '', $uri->getPath()),'/');
 
-        foreach ($methods as $method){
-            $method = in_array($method, ['','index','/']) ? '/' : $method;
+        if($methods){
+            foreach ($methods as $value){
+                $value = in_array($value, ['','index','/']) ? '/' : $value;
 
-            if(preg_match("~$method~", $path)){
+                if(preg_match("~$value~", $path) || $path === ''){
 
-                return $method == '/' ? 'index' : $method;
+                    return $value == '/' ? 'index' : $value;
+                }
             }
         }
-        return 'index';
+       return 'index';
     }
 
     /**
@@ -87,18 +91,18 @@ class Router implements RouterIntefaces
         foreach ($this->route as $data){
 
             /** @var $data Route */
-            /** @var $model Model */
+            /** @var $controller Controller */
 
-            $model = $data->getModel();
-            $methods = get_class_methods($model);
+            $controller = $data->getModel();
+
+            $methods = get_class_methods($controller);
 
             if($method = $this->parse($data->getPattern(), $uri, $methods)){
+                if(class_exists($controller)){
+                    $controller = new $controller;
 
-                if(class_exists($model)){
-                    $model = new $model;
-
-                    if(method_exists($model, $method)){
-                        return $model->$method();
+                    if(method_exists($controller, $method)){
+                        return $controller->$method();
                     }
                 }
             }

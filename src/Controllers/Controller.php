@@ -1,12 +1,17 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controllers;
 
-use App\ControllerTrait;
-use App\Interfaces\ControllerInterface;
+use App\ModelTrait;
 
-abstract class Controller implements ControllerInterface
+
+abstract class Controller
 {
-    use ControllerTrait;
+    public function index(){
 
+        return resource([
+            'head' => 'include.header',
+            'content' => 'user.login'
+        ])->layout('app');
+    }
 }

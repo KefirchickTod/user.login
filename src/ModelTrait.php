@@ -3,19 +3,24 @@
 
 namespace App;
 
-use App\Interfaces\ControllerInterface;
+
+use App\Models\Model;
 use App\Structure\Structure;
 
-/** @property ControllerInterface $controller
+/** @property Model $model
+ * @property Model $table
  */
-trait ControllerTrait
+trait ModelTrait
 {
+    
+    protected $fillable = [];
+    
     protected function find($id){
         return $this->where("id = ".(int)$id);
     }
 
     protected function where(string $where){
-        $table = $this->controller->getTable();
+        $table = $this->model->getTable();
         return Structure::creats()->set(
             [
                 $table =>
@@ -36,4 +41,22 @@ trait ControllerTrait
             return false;
         }, '');
     }
+
+    public function fill(array $data){
+        $fill = [];
+
+        foreach ($data as $name => $value){
+            if(in_array($name, $this->fillable)){
+                $fill[$name] = $value;
+            }
+        }
+        $this->fillable = $fill;
+        return $this;
+    }
+    
+    public function save(){
+        DB::getInstance()->dynamicInsert($this->table, $this->fillable);
+    }
+
+
 }

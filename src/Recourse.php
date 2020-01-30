@@ -7,57 +7,110 @@ namespace App;
 class Recourse
 {
 
-    const baseDir = '..\resources\\';
+    const rescource = '..\resources\\';
 
-    private $template = "<html>";
+    /**
+     * @var string
+     */
+    private $layots = '';
+    /**
+     * @var string
+     */
+    private $page = '';
+    /**
+     * @var array $param
+     */
+    private $param;
+    /**
+     * @var string[] $names
+     */
+    private $names;
 
-    private $resourse;
-
-    private $parram;
-
-    public function add(array $recourse)
+    public function __construct($names = [], $param = [])
     {
-        $this->resourse = $recourse;
+        $this->names = $names;
+        $this->param = $param;
+    }
+
+    public function set($names = [], $param = [])
+    {
+        $this->names = $names;
+        $this->param = $param;
+    }
+
+    protected function parse()
+    {
+        foreach ($this->names as &$name) {
+            $name = str_replace('.', '/', $name);
+        }
         return $this;
     }
 
-
-    private function parse()
+    private function replace($key, $value): string
     {
-        foreach ($this->resourse as &$name) {
-            $name = str_replace('.', '/', $name);
-        }
 
+        if (is_string($key) && !is_int($key)) {
+            $this->layots = preg_replace('/{%_' . $key . '_%}/', $value, $this->layots);
+
+            return $this->layots;
+        }
+        return $value;
     }
 
-    public function addParram(array $parram)
+    /**
+     * @return mixed|string
+     * @throws \ErrorException
+     */
+    public function render(): string
     {
-        $this->parram = $parram;
-    }
-
-    public function dir()
-    {
-        if ($this->parram) {
-            extract($this->parram);
+        $this->parse();
+        if ($this->param) {
+            extract($this->param);
         }
-        foreach ($this->resourse as $value) {
+        try {
+            foreach ($this->names as $replace => $path) {
+                $path = !file_exists("$path.php") ? self::rescource . "$path.php" : "$path.php";
+                if (file_exists($path)) {
 
-            $value = self::baseDir . $value . '.php';
-            if (file_exists($value)) {
-                $this->template .= include_once($value);
-            } else {
-                throw new \Error("Fount not found in path " . $value);
+                    ob_start();
+                    include_once($path);
+                    $content = ob_get_clean();
+
+                    $this->page .= $this->replace($replace, $content);
+                } else {
+
+                    throw new \Error("File not found in path " . $path);
+                }
             }
+        } catch (\Error $error) {
+            var_dump($error->getMessage());
+            error_log($error);
         }
+        $this->layots = '';
+        $page = preg_replace( "/{%_content_%}/", '' ,$this->page);
+        $this->page = '';
+        return $page;
+    }
+
+
+    public function layout($link)
+    {
+        $link = "layots." . $link;
+        $link = str_replace('.', '/', $link);
+        $this->layots = file_get_contents(self::rescource . "$link.php");
+        return $this;
     }
 
     public function __toString()
     {
-
-        $this->parse();
-        $this->dir();
-        $this->template .= "</html>";
-        return $this->template;
+        try {
+            ob_get_clean();
+            return $this->render();
+        } catch (\ErrorException $e) {
+            var_dump($e);
+            error_log($e->getMessage());
+            return '';
+        }
     }
 
 }

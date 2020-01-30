@@ -6,6 +6,7 @@
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
         crossorigin="anonymous"></script>
     <?php
-        echo addCss('css/css.css'), addJs('js/js.js');
+
+        echo  addCss('css/animsition.min.css'),addCss('css/css.css'),addJs('js/js.js'), addJs('js/animsition.min.js');
     ?>
 </head>
