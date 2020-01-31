@@ -93,13 +93,13 @@ if (!function_exists('redirect_post')) {
 
 if(!function_exists('isLogin')){
     function isLogin(){
-        return (bool)$_SESSION['log'];
+
+        return empty($_SESSION) ? false : (bool)$_SESSION['log'];
     }
 }
 
 if(!function_exists('redirect')){
     function redirect($path){
-        header("Location : $path");
-        exit;
+        header("Location: http://user.login.local/$path ");
     }
 }

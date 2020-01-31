@@ -10,7 +10,7 @@ class UserController extends Controller
         return resource([
             'head' => 'include.header',
             'content' => 'user.login'
-        ])->layout('app');
+        ])->layout('app')->render();
     }
 
     /**
@@ -40,8 +40,8 @@ class UserController extends Controller
         $user = new UserModels();
         $data = compact('password','name','remember_token','email','created_at');
         $user->fill($data);
-
-        return resource('welcom');
+        $_SESSION['log'] = true;
+        redirect('/user');
 
     }
 }

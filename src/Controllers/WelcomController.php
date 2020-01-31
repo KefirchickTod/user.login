@@ -12,7 +12,7 @@ class WelcomController
             return resource([
                 'head'    => 'include.header',
                 'content' => 'welcom',
-            ])->layout('app');
+            ])->layout('app')->render();
         }
         redirect('/login');
     }

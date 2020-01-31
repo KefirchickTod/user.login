@@ -34,7 +34,7 @@ class Route
 
     public function __construct($methods, $group, $callable, $indefier = 0) {
 
-        $this->methods = $methods;
+        $this->methods = array_map('strtoupper', $methods);
         $this->group = $group;
         $this->pattern = $group['pattern'] ?: '/';
         $this->model = $group['model'] ?: Model::class;

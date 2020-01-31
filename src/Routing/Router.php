@@ -6,8 +6,6 @@ namespace App\Routing;
 use App\Controllers\Controller;
 use App\HTTP\Uri;
 use App\Interfaces\RouterIntefaces;
-use App\Models\Model;
-use App\Recourse;
 
 
 class Router implements RouterIntefaces
@@ -39,7 +37,8 @@ class Router implements RouterIntefaces
         $this->route[] = $route;
     }
 
-    public function getMethod(){
+    public function getMethod()
+    {
 
     }
 
@@ -58,26 +57,28 @@ class Router implements RouterIntefaces
     {
         // TODO: Implement pathFor() method.
     }
-    public function name($name){
+
+    public function name($name)
+    {
         $this->container[$name] = $this;
     }
 
 
-    public function parse(string $pattern, Uri $uri, $methods) {
+    public function parse(string $pattern, Uri $uri, $methods)
+    {
 
-        $path = trim(str_replace($pattern, '', $uri->getPath()),'/');
+        $path = trim(str_replace($pattern, '', $uri->getPath()), '/');
 
-        if($methods){
-            foreach ($methods as $value){
-                $value = in_array($value, ['','index','/']) ? '/' : $value;
+        if ($methods) {
+            foreach ($methods as $value) {
+                $value = in_array($value, ['', 'index', '/']) ? '/' : $value;
 
-                if(preg_match("~$value~", $path) || $path === ''){
-
+                if (preg_match("~$value~", $path) || $path === '') {
                     return $value == '/' ? 'index' : $value;
                 }
             }
         }
-       return 'index';
+        return 'index';
     }
 
     /**
@@ -85,10 +86,10 @@ class Router implements RouterIntefaces
      */
 
 
-
-    public function run(){
+    public function run()
+    {
         $uri = \App\Http\Uri::creat(new \App\Http\ServerData());
-        foreach ($this->route as $data){
+        foreach ($this->route as $data) {
 
             /** @var $data Route */
             /** @var $controller Controller */
@@ -97,17 +98,20 @@ class Router implements RouterIntefaces
 
             $methods = get_class_methods($controller);
 
-            if($method = $this->parse($data->getPattern(), $uri, $methods)){
-                if(class_exists($controller)){
-                    $controller = new $controller;
+            if (preg_match("~" . $data->getPattern() . "~", $uri->getPath()) && in_array($uri->getMethod(),
+                    $data->getMethods())) {
+                if ($method = $this->parse($data->getPattern(), $uri, $methods)) {
+                    if (class_exists($controller)) {
+                        $controller = new $controller;
 
-                    if(method_exists($controller, $method)){
-                        return $controller->$method();
+                        if (method_exists($controller, $method)) {
+                            return $controller->$method();
+                        }
                     }
                 }
             }
         }
-        return '';
+        return resource('include.404')->render();
     }
 
 }
