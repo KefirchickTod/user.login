@@ -17,9 +17,16 @@ class UserModels extends Model
     protected $table = 'user';
 
     public function save(){
-        DB::getInstance()->dynamicInsert($this->table, $this->fillable);
-        $_SESSION['log'] = true;
-        $_SESSION['token'] = $this->fillable['remember_token'];
+
+        $isUser =  DB::getInstance()->selectSql('user', '*',"email = '{$this->fillable['email']}'");
+        if(empty($isUser) && !isset($isUser[0])){
+
+            DB::getInstance()->dynamicInsert($this->table, $this->fillable);
+            $_SESSION['log'] = true;
+            $_SESSION['token'] = $this->fillable['remember_token'];
+            return true;
+        }
+        return false;
 
     }
 }

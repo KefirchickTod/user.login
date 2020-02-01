@@ -14,6 +14,11 @@ class WelcomController
                 'content' => 'welcom',
             ])->layout('app')->render();
         }
-        redirect('/login');
+        redirect('login');
+    }
+
+    public function logout(){
+        unset($_SESSION['log']);
+        redirect('login');
     }
 }

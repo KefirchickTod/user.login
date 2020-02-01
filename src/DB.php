@@ -96,6 +96,7 @@ class DB
 
                 return $lastInsertId;
             } catch (\PDOException $e) {
+
                 $this->connection->rollBack();
                 $this->error($e->getMessage(), $STH->queryString);
                 return $e->getMessage();

@@ -46,6 +46,12 @@ if (!function_exists('addCss')) {
 
 if (!function_exists('resource')) {
 
+    /**
+     * @param $names
+     * @param array $param
+     * @return \App\Recourse
+     * @throws \ErrorException
+     */
     function resource($names, $param = [])
     {
         static $resource;
@@ -86,7 +92,9 @@ if (!function_exists('redirect_post')) {
             die();
         } else {
             // Error
-            throw new Exception("Error loading '$url', $php_errormsg");
+            $error = error_get_last();
+            debug($error);
+            throw new Exception("Error loading '$url', $error");
         }
     }
 }
@@ -94,12 +102,14 @@ if (!function_exists('redirect_post')) {
 if(!function_exists('isLogin')){
     function isLogin(){
 
-        return empty($_SESSION) ? false : (bool)$_SESSION['log'];
+        return empty($_SESSION) || !isset($_SESSION['log']) ? false : (bool)$_SESSION['log'];
     }
 }
 
 if(!function_exists('redirect')){
-    function redirect($path){
-        header("Location: http://user.login.local/$path ");
+    function redirect($path, $get = []){
+        $get = $get ? http_build_query($get) : null;
+
+        header("Location: http://user.login.local/$path".($get ? "?{$get}" : ''));
     }
 }

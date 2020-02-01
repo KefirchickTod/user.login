@@ -7,10 +7,14 @@ use App\Models\User\UserModels;
 class UserController extends Controller
 {
     public function index(){
-        return resource([
-            'head' => 'include.header',
-            'content' => 'user.login'
-        ])->layout('app')->render();
+        if(!isLogin()){
+
+            return resource([
+                'head' => 'include.header',
+                'content' => 'user.login'
+            ])->layout('app')->render();
+        }
+        return redirect('user');
     }
 
     /**
@@ -25,9 +29,6 @@ class UserController extends Controller
             'password'
         ]);
 
-        if($validation == false){
-            redirect_post('/login',$post);
-        }
 
         $password = md5(strip_tags(htmlspecialchars($post['password'])));
         $name = strip_tags(htmlspecialchars($post['username']));
@@ -39,9 +40,15 @@ class UserController extends Controller
         $created_at = date("Y-m-d H-i-s");
         $user = new UserModels();
         $data = compact('password','name','remember_token','email','created_at');
-        $user->fill($data);
-        $_SESSION['log'] = true;
-        redirect('/user');
+        $save = $user->fill($data)->save();
+        if($validation == false || $save == false){
+            $post['save'] = $save;
+            redirect('login', ['isset_user' => '1']);
+            return;
+        }
+
+        redirect('user');
+        return;
 
     }
 }

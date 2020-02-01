@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+
 
 date_default_timezone_set('Europe/Kiev'); //http://www.php.net/manual/en/timezones.php
 mb_language('uni');
